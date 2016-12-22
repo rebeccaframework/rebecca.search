@@ -1,5 +1,4 @@
 import colander as c
-import deform
 
 
 class AbstractExpression:
