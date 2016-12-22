@@ -1,4 +1,5 @@
 import colander as c
+from sqlalchemy import and_
 
 
 class AbstractExpression:
@@ -14,7 +15,7 @@ class AbstractExpression:
         return self.sql(self.column, self.value)
 
 
-class Expression(AbstractExpression):
+class EqualExpression(AbstractExpression):
     def sql(self, column, value):
         return column == value
 
@@ -31,14 +32,19 @@ class ContainsExpression(AbstractExpression):
         return column.contains(value)
 
 
+class RangeExpression(AbstractExpression):
+    def sql(self, column, value):
+        return and_(column <= value, column >= value)
+
+
 class ExpressionType(c.SchemaType):
     def __init__(self,
                  column,
-                 base_type_cls=c.String,
-                 expression_cls=Expression):
+                 base_type=c.String,
+                 expression_cls=EqualExpression):
         super(ExpressionType, self).__init__()
         self.column = column
-        self.base_type = base_type_cls()
+        self.base_type = base_type
         self.expression_cls = expression_cls
 
     def serialize(self, node, appstruct):
@@ -50,11 +56,14 @@ class ExpressionType(c.SchemaType):
         value = self.base_type.deserialize(node, cstruct)
         return self.expression_cls(self.column, value)
 
-    def contains(self):
-        return self.__class__(self.column, self.base_type, ContainsExpression)
+    def contains(self, typ=c.String()):
+        return self.__class__(self.column, typ, ContainsExpression)
 
-    def in_(self):
-        return self.__class__(self.column, c.Set, InExpression)
+    def in_(self, typ=c.Set()):
+        return self.__class__(self.column, typ, InExpression)
+
+    def eq(self, typ=c.String()):
+        return self.__class__(self.column, typ, EqualExpression)
 
 
 def sa_col(column):
