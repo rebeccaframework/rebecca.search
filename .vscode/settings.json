@@ -1,0 +1,9 @@
+{
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Path": "${workspaceRoot}/venv/Scripts/flake8.exe",
+    "python.formatting.provider": "yapf",
+    "python.formatting.yapfPath": "${workspaceRoot}/venv/Scripts/yapf.exe",
+    "python.formatting.formatOnSave": true
+}
