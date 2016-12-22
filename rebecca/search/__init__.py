@@ -60,11 +60,3 @@ class ExpressionType(c.SchemaType):
 
 def sa_col(column):
     return ExpressionType(column)
-
-
-class SearchForm(deform.Form):
-    def search(self, request, query):
-        controls = request.params.items()
-        params = self.validate(controls)
-        expressions = [e() for e in params.values()]
-        return query.filter(*expressions)
